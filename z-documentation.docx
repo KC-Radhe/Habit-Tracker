@@ -1,0 +1,30 @@
+*********HABIT TRACKER*********
+
+Day 1- Project Initialization & Server Setup
+    Objective: Establish the foundational backend environment and folder structure.
+
+    Tasks Completed:
+    1. Initialized project 
+        -> npm init -y
+
+    2. Installed dependencies
+        -> Core: express, mongoose, dotenv
+        -> Dev: nodemon
+    
+    3. Created folder structure
+        /backend
+        ├── /config
+        ├── /controllers
+        ├── /models
+        ├── /routes
+        ├── /middlewares
+        ├── server.js
+        └── .env
+
+    4. Configured '.env' file
+        -> set PORT and MONGO_URI
+
+    5. Set up Express server & connected mongoDB using mongoose
+
+
+    
