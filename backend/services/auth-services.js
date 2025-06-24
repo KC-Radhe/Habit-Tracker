@@ -23,7 +23,6 @@ class authService {
                 email: data.email, 
                 password: data.password
             });
-            req.session.userId = user._id;
             user.password = undefined;
             return {
                 statusCode: 201,
@@ -35,24 +34,25 @@ class authService {
         };
     };
 
-    async signinUser(data) {
+    async signinUser(req, res) {
         try {
-            if(!data.email || !data.password) throw {
+            if(!req.body.email || !req.body.password) throw {
                 statusCode: 400,
                 message: 'Credentials Empty!!!',
             };
-            const user = await this.userRepo.getBy({ email: data.email });
+            const user = await this.userRepo.getBy({ email: req.body.email });
             if(!user) throw {
                 statusCode: 404,
                 message: 'Email does not exists'
             };
 
-            const passwordCompare = bcrypt.compareSync(data.password, user.password);
+            const passwordCompare = bcrypt.compareSync(req.body.password, user.password);
             if(!passwordCompare) throw {
                 statuscode: 401,
                 message: 'Incorrect Password!!'
             };
-          user.password = undefined;
+            req.session.user = user._id;
+            user.password = undefined;
             return {
                 statusCode: 200,
                 message: 'Login successfully',
@@ -64,10 +64,16 @@ class authService {
         };
     };
 
-    async logoutUser(res) {
+    async logoutUser(req, res) {
         try {
+            if(!req.session || !req.session.user) {
+                return {
+                    statusCode: 401,
+                    message: 'Session expires or not authenticated'
+                }
+            }
             await new Promise((resolve, reject) => {
-                res.session.destroy((err) => {
+                req.session.destroy((err) => {
                     if(err) return reject(err);
                     res.clearCookie('connect.sid');
                     resolve();
@@ -75,7 +81,7 @@ class authService {
             });
             return {
                statusCode: 200,
-               message: 'Lougout successfully', 
+               message: 'Logout successfully', 
             }
         } catch (error) {
            throw error;
